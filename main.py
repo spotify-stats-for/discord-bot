@@ -102,22 +102,44 @@ async def ogloszenia(ctx):
     await ctx.message.delete()
 
     embed = discord.Embed(
-        title="**CPM PL FIRE & RESCUE**",
+        title="CPM PL FIRE & RESCUE",
         description=(
-            "\n\nDrodzy gracze oraz pasjonaci roleplay! 👋\n\nZ ogromną przyjemnością ogłaszamy otwarcie nowej społeczności RP w grze Car Parking Multiplayer 🎮, stworzonego z myślą o wszystkich, którzy chcą wspólnie budować realistyczne scenariusze służb ratunkowych.\n\n🚓🚑🚒 CMP PL FIRE&RESCUE to miejsce, w którym łączymy ludzi o wspólnej pasji do Policji, Pogotowia Ratunkowego oraz Straży Pożarnej.\n\nNaszym celem jest stworzenie aktywnej, zorganizowanej i przede wszystkim przyjaznej społeczności 🤝, gdzie każdy może wcielić się w wybraną rolę i uczestniczyć w realistycznych akcjach ratunkowych i patrolowych.\n\n🔥 Co oferujemy?\n• Realistyczne RP służb ratunkowych 🚓🚑🚒\n• Zgrany i aktywny zespół administracji 👮‍♂️\n• Wspólne akcje, patrole i wydarzenia 📢\n• Możliwość rozwoju swojej roli i awansu 📈\n\n💬 Szukamy osób, które są zaangażowane, potrafią współpracować i chcą wspólnie tworzyć coś wyjątkowego.\n\n🌟 Jeśli chcesz dołączyć do naszej społeczności i stać się częścią CMP PL FIRE&RESCUE – nie czekaj, dołącz już teraz!\n\n🚨 Razem tworzymy realizm, współpracę i dobrą zabawę w świecie RP! 🚨"
+            "DRODZY GRACZE ORAZ PASJONACI ROLEPLAY! 👋\n\n"
+            "Z OGROMNĄ PRZYJEMNOŚCIĄ OGŁASZAMY OTWARCIE NOWEJ SPOŁECZNOŚCI RP W GRZE CAR PARKING MULTIPLAYER 🎮,\n"
+            "STWORZONEJ Z MYŚLĄ O WSZYSTKICH, KTÓRZY CHCĄ WSPÓLNIE BUDOWAĆ REALISTYCZNE SCENARIUSZE SŁUŻB RATUNKOWYCH.\n\n"
+            "🚓🚑🚒 CMP PL FIRE & RESCUE TO MIEJSCE, W KTÓRYM ŁĄCZYMY LUDZI O WSPÓLNEJ PASJI DO POLICJI, POGOTOWIA RATUNKOWEGO ORAZ STRAŻY POŻARNEJ.\n\n"
+            "NASZYM CELEM JEST STWORZENIE AKTYWNEJ, ZORGANIZOWANEJ I PRZEDE WSZYSTKIM PRZYJAZNEJ SPOŁECZNOŚCI 🤝,\n"
+            "GDZIE KAŻDY MOŻE WCIELIĆ SIĘ W WYBRANĄ ROLĘ I UCZESTNICZYĆ W REALISTYCZNYCH AKCJACH RATUNKOWYCH I PATROLOWYCH.\n\n"
+            "🔥 CO OFERUJEMY?\n"
+            "• REALISTYCZNE RP SŁUŻB RATUNKOWYCH 🚓🚑🚒\n"
+            "• ZGRANY I AKTYWNY ZESPÓŁ ADMINISTRACJI 👮‍♂️\n"
+            "• WSPÓLNE AKCJE, PATROLE I WYDARZENIA 📢\n"
+            "• MOŻLIWOŚĆ ROZWOJU SWOJEJ ROLI I AWANSU 📈\n\n"
+            "💬 SZUKAMY OSÓB, KTÓRE SĄ ZAANGAŻOWANE, POTRAFIĄ WSPÓŁPRACOWAĆ I CHCĄ WSPÓLNIE TWORZYĆ COŚ WYJĄTKOWEGO.\n\n"
+            "🌟 JEŚLI CHCESZ DOŁĄCZYĆ DO NASZEJ SPOŁECZNOŚCI I STAĆ SIĘ CZĘŚCIĄ CMP PL FIRE & RESCUE – NIE CZEKAJ, DOŁĄCZ JUŻ TERAZ!\n\n"
+            "🚨 RAZEM TWORZYMY REALIZM, WSPÓŁPRACĘ I DOBRĄ ZABAWĘ W ŚWIECIE RP! 🚨"
         ),
         color=discord.Color.orange()
     )
 
+    # LOGO BOTA (thumbnail)
     embed.set_thumbnail(url=bot.user.display_avatar.url)
+
+    # STOPKA Z LOGO BOTA + NAZWA
+    embed.set_footer(
+        text="CMP PL FIRE & RESCUE",
+        icon_url=bot.user.display_avatar.url
+    )
 
     await ctx.send(embed=embed)
 
-    await send_log(discord.Embed(
-        title="📢 OGŁOSZENIE",
-        description=f"Autor: {ctx.author}",
-        color=discord.Color.orange()
-    ))
+    await send_log(
+        discord.Embed(
+            title="📢 OGŁOSZENIE",
+            description=f"AUTOR: {ctx.author}",
+            color=discord.Color.orange()
+        )
+    )
 
 
 # =====================
