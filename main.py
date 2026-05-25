@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # =====================
-# INTENTS
+# INTENTS + BOT
 # =====================
 intents = discord.Intents.default()
 intents.message_content = True
@@ -68,72 +68,15 @@ def is_admin():
 
 
 # =====================
-# HELP (FULL FORMAT)
-# =====================
-@bot.command(name="pomoc")
-async def pomoc(ctx):
-    await ctx.message.delete()
-
-    embed = discord.Embed(
-        title="📘 CPM PL FIRE & RESCUE • HELP",
-        description="Format komend bota 🚒",
-        color=discord.Color.green()
-    )
-
-    embed.set_thumbnail(url=bot.user.display_avatar.url)
-
-    embed.add_field(
-        name="👥 Dla wszystkich",
-        value=(
-            "`&ping` – sprawdź ping bota\n"
-            "`&info` – informacje o RP"
-        ),
-        inline=False
-    )
-
-    embed.add_field(
-        name="📢 Ogłoszenia (ADMIN)",
-        value="`&ogloszenia` – wysyła embed RP",
-        inline=False
-    )
-
-    embed.add_field(
-        name="🧹 Clear (ADMIN)",
-        value="`&clear [ilość]` – usuwa wiadomości",
-        inline=False
-    )
-
-    embed.add_field(
-        name="👢 Kick (ADMIN)",
-        value="`&kick @user [powód]`",
-        inline=False
-    )
-
-    embed.add_field(
-        name="🔨 Ban (ADMIN)",
-        value="`&ban @user [powód]`",
-        inline=False
-    )
-
-    embed.add_field(
-        name="🎨 Embed",
-        value="`&embed` – tworzy custom embed",
-        inline=False
-    )
-
-    await ctx.send(embed=embed)
-
-
-# =====================
-# PING
+# PING (ALL)
 # =====================
 @bot.command()
 async def ping(ctx):
-    await ctx.send(f"🏓 `{round(bot.latency * 1000)}ms`")
+    await ctx.send(f"🏓 Pong! `{round(bot.latency * 1000)}ms`")
 
 
 # =====================
-# INFO
+# INFO (ALL)
 # =====================
 @bot.command()
 async def info(ctx):
@@ -178,13 +121,13 @@ async def ogloszenia(ctx):
 
     await send_log(discord.Embed(
         title="📢 OGŁOSZENIE",
-        description=f"Moderator: {ctx.author}",
+        description=f"Autor: {ctx.author}",
         color=discord.Color.orange()
     ))
 
 
 # =====================
-# CLEAR
+# CLEAR (ADMIN)
 # =====================
 @bot.command()
 @is_admin()
@@ -207,7 +150,7 @@ async def clear(ctx, amount: int = None):
 
 
 # =====================
-# KICK
+# KICK (ADMIN)
 # =====================
 @bot.command()
 @is_admin()
@@ -225,7 +168,7 @@ async def kick(ctx, member: discord.Member, *, reason="Brak powodu"):
 
 
 # =====================
-# BAN
+# BAN (ADMIN)
 # =====================
 @bot.command()
 @is_admin()
@@ -243,25 +186,74 @@ async def ban(ctx, member: discord.Member, *, reason="Brak powodu"):
 
 
 # =====================
-# CUSTOM EMBED BUILDER
+# HELP (KATEGORIE)
 # =====================
-@bot.command()
-async def embed(ctx, *, content: str):
-
+@bot.command(name="pomoc")
+async def pomoc(ctx):
     await ctx.message.delete()
 
-    # format:
-    # title | description | color | avatar:on/off | footer:on/off
+    embed = discord.Embed(
+        title="📘 CPM PL FIRE & RESCUE • HELP",
+        description="Kategorie komend 🚒",
+        color=discord.Color.green()
+    )
+
+    embed.set_thumbnail(url=bot.user.display_avatar.url)
+
+    embed.add_field(
+        name="👥 Dla wszystkich",
+        value=(
+            "`&ping`\n"
+            "`&info`"
+        ),
+        inline=False
+    )
+
+    embed.add_field(
+        name="📢 Ogólne",
+        value="`&ogloszenia` (ADMIN)",
+        inline=False
+    )
+
+    embed.add_field(
+        name="🛠 Moderacja",
+        value=(
+            "`&clear [ilość]`\n"
+            "`&kick @user [powód]`\n"
+            "`&ban @user [powód]`"
+        ),
+        inline=False
+    )
+
+    await ctx.send(embed=embed)
+
+
+# =====================
+# EMBED BUILDER (ADMIN ONLY - FIXED)
+# =====================
+@bot.command()
+@is_admin()
+async def embed(ctx, *, content=None):
+
+    if content is None:
+        await ctx.send("❌ Użycie: `&embed tytuł|opis|blue|on|on`", delete_after=5)
+        return
 
     try:
         title, desc, color, avatar, footer = content.split("|")
 
-        color = getattr(discord.Color, color.strip(), discord.Color.blue)
+        colors = {
+            "blue": discord.Color.blue(),
+            "red": discord.Color.red(),
+            "green": discord.Color.green(),
+            "orange": discord.Color.orange(),
+            "purple": discord.Color.purple()
+        }
 
         embed = discord.Embed(
             title=title.strip(),
             description=desc.strip(),
-            color=color()
+            color=colors.get(color.strip().lower(), discord.Color.blue())
         )
 
         if avatar.strip().lower() == "on":
@@ -278,8 +270,12 @@ async def embed(ctx, *, content: str):
             color=discord.Color.purple()
         ))
 
-    except:
-        await ctx.send("❌ Błąd formatu!\n`&embed tytuł|opis|blue|on|on`", delete_after=5)
+    except ValueError:
+        await ctx.send(
+            "❌ Zły format!\n"
+            "`&embed tytuł|opis|blue|on|on`",
+            delete_after=5
+        )
 
 
 # =====================
@@ -299,6 +295,6 @@ async def on_command_error(ctx, error):
 
 
 # =====================
-# START
+# START BOT
 # =====================
 bot.run(os.getenv("TOKEN"))
