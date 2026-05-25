@@ -220,7 +220,8 @@ async def pomoc(ctx):
         value=(
             "`&clear [ilość]`\n"
             "`&kick @user [powód]`\n"
-            "`&ban @user [powód]`"
+            "`&ban @user [powód]`\n"
+            "`&embed`"
         ),
         inline=False
     )
@@ -236,7 +237,7 @@ async def pomoc(ctx):
 async def embed(ctx, *, content=None):
 
     if content is None:
-        await ctx.send("❌ Użycie: `&embed tytuł|opis|blue/red/green/orange/purple|av on/off|stopka on/off`", delete_after=5)
+        await ctx.send("❌ Użycie: `&embed tytuł|opis|blue/red/green/orange/purple|av on/off|stopka on/off`", delete_after=35)
         return
 
     try:
