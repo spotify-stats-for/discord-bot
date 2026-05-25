@@ -46,12 +46,11 @@ async def ogloszenia(ctx):
         title="📢 OGŁOSZENIE",
         description=(
             "**CPM PL FIRE & RESCUE**\n\n"
-            "Właśnie doszło do **otwarcia serwera/społeczności RP** w grze "
-            "**Car Parking Multiplayer**.\n\n"
+            "Właśnie doszło do **otwarcia społeczności RP**\n\n"
             "🔴 Zachęcamy wszystkich do dalszej aktywności i budowy społeczności.\n\n"
-            "👉 Wybierz swoje role na kanale: <#SELFROLE_ID>\n"
+            "👉 Wybierz swoje role na kanale: <#1508527145658351730>\n"
             "👉 Pisz na czacie i bądź aktywny!\n\n"
-            "🚒 CPM PL FIRE & RESCUE nadal działa i szuka nowych członków!"
+            "🚒 CPM PL FIRE & RESCUE działa i szuka nowych członków!"
         ),
         color=discord.Color.red()
     )
