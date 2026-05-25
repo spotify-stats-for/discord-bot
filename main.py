@@ -10,10 +10,15 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix="&", intents=intents)
 
-# ===== STATUSY =====
+
+# =====================
+# STATUSY
+# =====================
 statuses = [
-    "*Gra w* Car Parking Multiplayer",
-    "Porucznik gotowy do działania 🚒"
+    "&help | CPM PL FIRE & RESCUE 🚒",
+    "Car Parking Multiplayer 🚗",
+    "RP Community Start 🔥",
+    "Porucznik gotowy do działania 👨‍🚒"
 ]
 
 status_index = 0
@@ -35,27 +40,141 @@ async def on_ready():
     change_status.start()
 
 
-# ===== KOMENDA OGŁOSZENIA =====
-@bot.command(name="ogloszenia")
-async def ogloszenia(ctx):
+# =====================
+# CHECK ADMIN
+# =====================
+def is_admin():
+    async def predicate(ctx):
+        return ctx.author.guild_permissions.administrator
+    return commands.check(predicate)
 
-    # usuwa wiadomość z komendą
+
+# =====================
+# HELP MENU (SELECT)
+# =====================
+class HelpSelect(discord.ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(label="📢 Informacje", description="Info o serwerze RP"),
+            discord.SelectOption(label="🎮 RP Start", description="Jak zacząć RP"),
+            discord.SelectOption(label="🛠 Komendy Admina", description="Tylko dla administracji"),
+        ]
+
+        super().__init__(
+            placeholder="Wybierz kategorię komend...",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+
+        embed = discord.Embed(color=discord.Color.blue())
+
+        if self.values[0] == "📢 Informacje":
+            embed.title = "📢 Informacje"
+            embed.description = (
+                "🚒 **CPM PL FIRE & RESCUE**\n\n"
+                "Nowa społeczność RP w Car Parking Multiplayer 🚗\n"
+                "Tworzymy role i realistyczne RP."
+            )
+
+        elif self.values[0] == "🎮 RP Start":
+            embed.title = "🎮 Jak zacząć RP"
+            embed.description = (
+                "1️⃣ Wybierz role na selfrole\n"
+                "2️⃣ Dołącz do aktywności na czacie\n"
+                "3️⃣ Graj RP w Car Parking Multiplayer 🚗\n"
+                "4️⃣ Twórz akcje i scenariusze 🚒"
+            )
+
+        elif self.values[0] == "🛠 Komendy Admina":
+            embed.title = "🛠 Komendy Admina"
+
+            embed.description = (
+                "🔒 Dostęp tylko dla administracji\n\n"
+                "`&clear` – usuń wiadomości\n"
+                "`&kick` – wyrzuć użytkownika\n"
+                "`&ban` – zbanuj użytkownika"
+            )
+
+        await interaction.response.edit_message(embed=embed)
+
+
+class HelpView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(HelpSelect())
+
+
+# =====================
+# HELP COMMAND
+# =====================
+@bot.command(name="help")
+async def help_cmd(ctx):
     await ctx.message.delete()
 
     embed = discord.Embed(
-        title="📢 OGŁOSZENIE",
-        description=(
-            "**CPM PL FIRE & RESCUE**\n\n"
-            "Właśnie doszło do **otwarcia społeczności RP**\n\n"
-            "🔴 Zachęcamy wszystkich do dalszej aktywności i budowy społeczności.\n\n"
-            "👉 Wybierz swoje role na kanale: <#1508527145658351730>\n"
-            "👉 Pisz na czacie i bądź aktywny!\n\n"
-            "🚒 CPM PL FIRE & RESCUE działa i szuka nowych członków!"
-        ),
+        title="📘 CPM PL FIRE & RESCUE HELP",
+        description="Wybierz kategorię komend z menu poniżej 👇",
+        color=discord.Color.green()
+    )
+
+    embed.set_thumbnail(url=bot.user.display_avatar.url)
+
+    await ctx.send(embed=embed, view=HelpView())
+
+
+# =====================
+# INFO
+# =====================
+@bot.command()
+async def info(ctx):
+    await ctx.message.delete()
+
+    embed = discord.Embed(
+        title="🚒 CPM PL FIRE & RESCUE",
+        description="Start społeczności RP w Car Parking Multiplayer 🚗",
         color=discord.Color.red()
     )
 
-    embed.set_footer(text="CPM PL FIRE & RESCUE • RP Community")
+    embed.set_thumbnail(url=bot.user.display_avatar.url)
+
+    await ctx.send(embed=embed)
+
+
+# =====================
+# ADMIN COMMAND EXAMPLE
+# =====================
+@bot.command()
+@is_admin()
+async def clear(ctx, amount: int = 10):
+    await ctx.channel.purge(limit=amount + 1)
+    msg = await ctx.send(f"🧹 Usunięto {amount} wiadomości")
+    await msg.delete(delay=3)
+
+
+# =====================
+# OGŁOSZENIA
+# =====================
+@bot.command()
+async def ogloszenia(ctx):
+    await ctx.message.delete()
+
+    embed = discord.Embed(
+        title="🚒🔥 START RP COMMUNITY",
+        description=(
+            "**CPM PL FIRE & RESCUE**\n\n"
+            "🚗 Car Parking Multiplayer RP\n"
+            "🚒 Straż Pożarna\n"
+            "🚓 Policja\n\n"
+            "👉 Wybierz role na selfrole\n"
+            "👉 Dołącz do społeczności RP\n"
+        ),
+        color=discord.Color.orange()
+    )
+
+    embed.set_thumbnail(url=bot.user.display_avatar.url)
 
     await ctx.send(embed=embed)
 
