@@ -104,13 +104,7 @@ async def ogloszenia(ctx):
     embed = discord.Embed(
         title="**CPM PL FIRE & RESCUE**",
         description=(
-            "🚗 Car Parking Multiplayer RP\n\n"
-            "🚒 OSP – Ochotnicza Straż Pożarna\n"
-            "🚒 PSP – Państwowa Straż Pożarna\n"
-            "🚓 POLICJA\n"
-            "🚑 ZRM\n\n"
-            "👉 Wybierz role na <#1508527145658351730>\n"
-            "👉 Zacznij pisać na <#1508552147707498608>\n"
+            "\n\nDrodzy gracze oraz pasjonaci roleplay! 👋\n\nZ ogromną przyjemnością ogłaszamy otwarcie nowej społeczności RP w grze Car Parking Multiplayer 🎮, stworzonego z myślą o wszystkich, którzy chcą wspólnie budować realistyczne scenariusze służb ratunkowych.\n\n🚓🚑🚒 CMP PL FIRE&RESCUE to miejsce, w którym łączymy ludzi o wspólnej pasji do Policji, Pogotowia Ratunkowego oraz Straży Pożarnej.\n\nNaszym celem jest stworzenie aktywnej, zorganizowanej i przede wszystkim przyjaznej społeczności 🤝, gdzie każdy może wcielić się w wybraną rolę i uczestniczyć w realistycznych akcjach ratunkowych i patrolowych.\n\n🔥 Co oferujemy?\n• Realistyczne RP służb ratunkowych 🚓🚑🚒\n• Zgrany i aktywny zespół administracji 👮‍♂️\n• Wspólne akcje, patrole i wydarzenia 📢\n• Możliwość rozwoju swojej roli i awansu 📈\n\n💬 Szukamy osób, które są zaangażowane, potrafią współpracować i chcą wspólnie tworzyć coś wyjątkowego.\n\n🌟 Jeśli chcesz dołączyć do naszej społeczności i stać się częścią CMP PL FIRE&RESCUE – nie czekaj, dołącz już teraz!\n\n🚨 Razem tworzymy realizm, współpracę i dobrą zabawę w świecie RP! 🚨"
         ),
         color=discord.Color.orange()
     )
