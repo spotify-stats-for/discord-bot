@@ -8,12 +8,12 @@ load_dotenv()
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix="©", intents=intents)
+bot = commands.Bot(command_prefix="&", intents=intents)
 
 # ===== STATUSY =====
 statuses = [
-    "Car Parking Multiplayer 🚗",
-    "Porucznik | gotowy do działania 🚒"
+    "*Gra w* Car Parking Multiplayer",
+    "Porucznik gotowy do działania 🚒"
 ]
 
 status_index = 0
