@@ -104,28 +104,22 @@ async def ogloszenia(ctx):
     embed = discord.Embed(
         title="CPM PL FIRE & RESCUE",
         description=(
-            "DRODZY GRACZE ORAZ PASJONACI ROLEPLAY! 👋\n\n"
-            "Z OGROMNĄ PRZYJEMNOŚCIĄ OGŁASZAMY OTWARCIE NOWEJ SPOŁECZNOŚCI RP W GRZE CAR PARKING MULTIPLAYER 🎮,\n"
-            "STWORZONEJ Z MYŚLĄ O WSZYSTKICH, KTÓRZY CHCĄ WSPÓLNIE BUDOWAĆ REALISTYCZNE SCENARIUSZE SŁUŻB RATUNKOWYCH.\n\n"
-            "🚓🚑🚒 CMP PL FIRE & RESCUE TO MIEJSCE, W KTÓRYM ŁĄCZYMY LUDZI O WSPÓLNEJ PASJI DO POLICJI, POGOTOWIA RATUNKOWEGO ORAZ STRAŻY POŻARNEJ.\n\n"
-            "NASZYM CELEM JEST STWORZENIE AKTYWNEJ, ZORGANIZOWANEJ I PRZEDE WSZYSTKIM PRZYJAZNEJ SPOŁECZNOŚCI 🤝,\n"
-            "GDZIE KAŻDY MOŻE WCIELIĆ SIĘ W WYBRANĄ ROLĘ I UCZESTNICZYĆ W REALISTYCZNYCH AKCJACH RATUNKOWYCH I PATROLOWYCH.\n\n"
-            "🔥 CO OFERUJEMY?\n"
-            "• REALISTYCZNE RP SŁUŻB RATUNKOWYCH 🚓🚑🚒\n"
-            "• ZGRANY I AKTYWNY ZESPÓŁ ADMINISTRACJI 👮‍♂️\n"
-            "• WSPÓLNE AKCJE, PATROLE I WYDARZENIA 📢\n"
-            "• MOŻLIWOŚĆ ROZWOJU SWOJEJ ROLI I AWANSU 📈\n\n"
-            "💬 SZUKAMY OSÓB, KTÓRE SĄ ZAANGAŻOWANE, POTRAFIĄ WSPÓŁPRACOWAĆ I CHCĄ WSPÓLNIE TWORZYĆ COŚ WYJĄTKOWEGO.\n\n"
-            "🌟 JEŚLI CHCESZ DOŁĄCZYĆ DO NASZEJ SPOŁECZNOŚCI I STAĆ SIĘ CZĘŚCIĄ CMP PL FIRE & RESCUE – NIE CZEKAJ, DOŁĄCZ JUŻ TERAZ!\n\n"
-            "🚨 RAZEM TWORZYMY REALIZM, WSPÓŁPRACĘ I DOBRĄ ZABAWĘ W ŚWIECIE RP! 🚨"
+            "Drodzy gracze oraz pasjonaci roleplay! 👋\n\n"
+            "Z ogromną przyjemnością ogłaszamy otwarcie nowej społeczności RP w grze Car Parking Multiplayer 🎮, "
+            "stworzonej z myślą o realistycznych scenariuszach służb ratunkowych.\n\n"
+            "🚓🚑🚒 CMP PL FIRE & RESCUE to miejsce łączące Policję, Pogotowie i Straż Pożarną.\n\n"
+            "Naszym celem jest aktywna i zorganizowana społeczność 🤝, gdzie każdy może wcielić się w rolę i brać udział w akcjach.\n\n"
+            "🔥 Co oferujemy:\n"
+            "• Realistyczne RP służb 🚓🚑🚒\n"
+            "• Aktywną administrację 👮‍♂️\n"
+            "• Patrole i eventy 📢\n"
+            "• Awans i rozwój 📈\n\n"
+            "💬 Szukamy osób zaangażowanych i chętnych do współpracy.\n\n"
+            "🌟 Zapraszamy do dołączenia!"
         ),
         color=discord.Color.orange()
     )
 
-    # LOGO BOTA (thumbnail)
-    embed.set_thumbnail(url=bot.user.display_avatar.url)
-
-    # STOPKA Z LOGO BOTA + NAZWA
     embed.set_footer(
         text="CMP PL FIRE & RESCUE",
         icon_url=bot.user.display_avatar.url
@@ -133,10 +127,11 @@ async def ogloszenia(ctx):
 
     await ctx.send(embed=embed)
 
+    # LOG SYSTEM (to co usunąłem przypadkiem)
     await send_log(
         discord.Embed(
             title="📢 OGŁOSZENIE",
-            description=f"AUTOR: {ctx.author}",
+            description=f"Autor: {ctx.author}",
             color=discord.Color.orange()
         )
     )
