@@ -17,7 +17,7 @@ bot = commands.Bot(command_prefix="&", intents=intents, help_command=None)
 statuses = [
     "&pomoc | CPM PL FIRE & RESCUE 🚒",
     "Car Parking Multiplayer 🚗",
-    "RP • OSP / PSP / POLICJA / ZRM 🔥"
+    "OSP • PSP • POLICJA • ZRM 🔥"
 ]
 
 status_index = 0
@@ -41,16 +41,22 @@ async def on_ready():
 
 
 # =====================
-# PING (dla wszystkich)
+# CHECK ADMIN
+# =====================
+def is_admin():
+    async def predicate(ctx):
+        return ctx.author.guild_permissions.administrator
+    return commands.check(predicate)
+
+
+# =====================
+# KOMENDY DLA WSZYSTKICH
 # =====================
 @bot.command()
 async def ping(ctx):
     await ctx.send(f"🏓 Pong! `{round(bot.latency * 1000)}ms`")
 
 
-# =====================
-# INFO
-# =====================
 @bot.command()
 async def info(ctx):
     await ctx.message.delete()
@@ -59,11 +65,11 @@ async def info(ctx):
         title="🚒 CPM PL FIRE & RESCUE",
         description=(
             "🚗 **Car Parking Multiplayer RP**\n\n"
-            "🔥 Społeczność RP:\n"
-            "🚒 OSP (Ochotnicza Straż Pożarna)\n"
-            "🚒 PSP (Państwowa Straż Pożarna)\n"
+            "🔥 Służby RP:\n"
+            "🚒 OSP\n"
+            "🚒 PSP\n"
             "🚓 POLICJA\n"
-            "🚑 ZRM (Zespół Ratownictwa Medycznego)\n"
+            "🚑 ZRM"
         ),
         color=discord.Color.red()
     )
@@ -74,21 +80,22 @@ async def info(ctx):
 
 
 # =====================
-# OGŁOSZENIE (TWÓJ STYL)
+# OGŁOSZENIA (TYLKO ADMIN)
 # =====================
 @bot.command()
+@is_admin()
 async def ogloszenia(ctx):
     await ctx.message.delete()
 
     embed = discord.Embed(
         title="**CPM PL FIRE & RESCUE**",
         description=(
-            "🚗 **Car Parking Multiplayer RP**\n"
-            "(Car Parking Multiplayer – gra symulacyjna RP w otwartym świecie)\n\n"
+            "🚗 Car Parking Multiplayer RP\n"
+            "(Car Parking Multiplayer – gra RP)\n\n"
             "🚒 OSP – Ochotnicza Straż Pożarna\n"
             "🚒 PSP – Państwowa Straż Pożarna\n"
-            "🚓 POLICJA – służby porządkowe\n"
-            "🚑 ZRM – Zespół Ratownictwa Medycznego\n\n"
+            "🚓 POLICJA – jednostki porządkowe\n"
+            "🚑 ZRM – ratownictwo medyczne\n\n"
             "👉 Wybierz role na <#1508527145658351730>\n"
             "👉 Dołącz do społeczności RP\n"
             "👉 Zacznij pisać na <#1508552147707498608>\n"
@@ -96,14 +103,33 @@ async def ogloszenia(ctx):
         color=discord.Color.orange()
     )
 
-    # LOGO BOTA (bez zmian)
     embed.set_thumbnail(url=bot.user.display_avatar.url)
 
     await ctx.send(embed=embed)
 
 
 # =====================
-# HELP (ULEPSZONY)
+# KICK (ADMIN)
+# =====================
+@bot.command()
+@is_admin()
+async def kick(ctx, member: discord.Member, *, reason="Brak powodu"):
+    await member.kick(reason=reason)
+    await ctx.send(f"👢 Wyrzucono {member.mention} | Powód: {reason}")
+
+
+# =====================
+# BAN (ADMIN)
+# =====================
+@bot.command()
+@is_admin()
+async def ban(ctx, member: discord.Member, *, reason="Brak powodu"):
+    await member.ban(reason=reason)
+    await ctx.send(f"🔨 Zbanowano {member.mention} | Powód: {reason}")
+
+
+# =====================
+# HELP (KATEGORIE ZOSTAJĄ)
 # =====================
 @bot.command(name="pomoc")
 async def pomoc(ctx):
@@ -111,50 +137,41 @@ async def pomoc(ctx):
 
     embed = discord.Embed(
         title="📘 CPM PL FIRE & RESCUE • POMOC",
-        description="Lista dostępnych komend bota RP 🚒",
+        description="Kategorie komend bota 🚒",
         color=discord.Color.green()
     )
 
     embed.set_thumbnail(url=bot.user.display_avatar.url)
 
-    # PUBLICZNE KOMENDY
     embed.add_field(
-        name="👥 Komendy dla wszystkich",
+        name="👥 Dla wszystkich",
         value=(
-            "`&ping` – sprawdź opóźnienie bota\n"
-            "`&info` – informacje o społeczności RP\n"
-            "`&ogloszenia` – oficjalne ogłoszenie RP"
+            "`&ping` – sprawdź ping bota\n"
+            "`&info` – informacje o RP"
         ),
         inline=False
     )
 
-    # ADMIN KOMENDY
     embed.add_field(
-        name="🛠 Komendy administracyjne",
+        name="📢 Ogólne RP",
         value=(
-            "`&clear [ilość]` – usuwa wiadomości (admin)\n"
+            "`&ogloszenia` – ogłoszenie serwera RP"
         ),
         inline=False
     )
 
-    embed.set_footer(text="CPM PL FIRE & RESCUE • RP Community")
+    embed.add_field(
+        name="🛠 Administracja",
+        value=(
+            "`&kick @user [powód]`\n"
+            "`&ban @user [powód]`\n"
+        ),
+        inline=False
+    )
+
+    embed.set_footer(text="CPM PL FIRE & RESCUE • RP System")
 
     await ctx.send(embed=embed)
-
-
-# =====================
-# ADMIN CLEAR
-# =====================
-def is_admin():
-    async def predicate(ctx):
-        return ctx.author.guild_permissions.administrator
-    return commands.check(predicate)
-
-
-@bot.command()
-@is_admin()
-async def clear(ctx, amount: int = 10):
-    await ctx.channel.purge(limit=amount + 1)
 
 
 bot.run(os.getenv("TOKEN"))
