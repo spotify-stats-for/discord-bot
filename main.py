@@ -15,7 +15,7 @@ bot = commands.Bot(command_prefix="&", intents=intents)
 # STATUSY
 # =====================
 statuses = [
-    "&help | CPM PL FIRE & RESCUE 🚒",
+    "&pomoc | CPM PL FIRE & RESCUE 🚒",
     "Car Parking Multiplayer 🚗",
     "RP Community Start 🔥",
     "Porucznik gotowy do działania 👨‍🚒"
@@ -110,7 +110,7 @@ class HelpView(discord.ui.View):
 # =====================
 # HELP COMMAND
 # =====================
-@bot.command(name="help")
+@bot.command(name="pomoc")
 async def help_cmd(ctx):
     await ctx.message.delete()
 
