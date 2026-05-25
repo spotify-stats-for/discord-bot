@@ -236,7 +236,7 @@ async def pomoc(ctx):
 async def embed(ctx, *, content=None):
 
     if content is None:
-        await ctx.send("❌ Użycie: `&embed tytuł|opis|blue|on|on`", delete_after=5)
+        await ctx.send("❌ Użycie: `&embed tytuł|opis|blue/red/green/orange/purple|av on/off|stopka on/off`", delete_after=5)
         return
 
     try:
