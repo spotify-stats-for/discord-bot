@@ -726,4 +726,4 @@ async def on_command_error(ctx, error):
 # =====================  
 # START BOT  
 # =====================  
-bot.run(os.getenv("TOKEN"))  
+bot.run(os.getenv("TN"))  
