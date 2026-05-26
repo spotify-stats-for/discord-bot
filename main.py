@@ -370,9 +370,31 @@ async def pomoc(ctx):
         view=HelpView()
     )
 
+# =========================
+# WYBÓR KANAŁU (POPRAWNY)
+# =========================
+
+class ChannelSelect(discord.ui.ChannelSelect):
+    def __init__(self):
+        super().__init__(
+            placeholder="📢 Wybierz kanał wysyłki...",
+            channel_types=[discord.ChannelType.text],
+            min_values=1,
+            max_values=1,
+            row=5
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        self.view.send_channel = self.values[0]
+
+        await interaction.response.send_message(
+            f"✅ Kanał ustawiony: {self.values[0].mention}",
+            ephemeral=True
+        )
+
 
 # =========================
-# KREATOR EMBEDÓW PREMIUM
+# KREATOR EMBEDÓW
 # =========================
 
 class EmbedCreator(discord.ui.View):
@@ -396,8 +418,10 @@ class EmbedCreator(discord.ui.View):
 
         self.send_channel = None
 
+        self.add_item(ChannelSelect())
+
     # =========================
-    # BUDOWANIE EMBEDA
+    # EMBED BUILDER
     # =========================
 
     def build_embed(self):
@@ -408,7 +432,7 @@ class EmbedCreator(discord.ui.View):
             color=self.embed_color
         )
 
-        # MINIATURKA
+        # OBRAZEK
         if self.image_mode == "bot":
             embed.set_thumbnail(url=bot.user.display_avatar.url)
 
@@ -420,9 +444,7 @@ class EmbedCreator(discord.ui.View):
 
         # STOPKA
         if self.footer_mode == "default":
-            embed.set_footer(
-                text="CPM PL FIRE & RESCUE • Custom Embed"
-            )
+            embed.set_footer(text="CPM PL FIRE & RESCUE • Custom Embed")
 
         elif self.footer_mode == "bot":
             embed.set_footer(
@@ -439,7 +461,7 @@ class EmbedCreator(discord.ui.View):
         elif self.footer_mode == "custom" and self.custom_footer:
             embed.set_footer(text=self.custom_footer)
 
-        # DATA I GODZINA
+        # TIMESTAMP
         if self.timestamp_enabled:
             embed.timestamp = discord.utils.utcnow()
 
@@ -464,7 +486,7 @@ class EmbedCreator(discord.ui.View):
                 max_length=256
             )
 
-            description_input = discord.ui.TextInput(
+            desc_input = discord.ui.TextInput(
                 label="Opis",
                 style=discord.TextStyle.paragraph,
                 default=self.embed_description,
@@ -474,7 +496,7 @@ class EmbedCreator(discord.ui.View):
             async def on_submit(modal_self, interaction2):
 
                 self.embed_title = str(modal_self.title_input)
-                self.embed_description = str(modal_self.description_input)
+                self.embed_description = str(modal_self.desc_input)
 
                 await interaction2.response.edit_message(
                     embed=self.build_embed(),
@@ -484,7 +506,7 @@ class EmbedCreator(discord.ui.View):
         await interaction.response.send_modal(TextModal())
 
     # =========================
-    # KOLORY
+    # KOLOR
     # =========================
 
     @discord.ui.select(
@@ -516,75 +538,41 @@ class EmbedCreator(discord.ui.View):
         )
 
     # =========================
-    # WYBÓR OBRAZU
+    # OBRAZ
     # =========================
 
     @discord.ui.select(
-        placeholder="🖼 Ustawienia obrazka...",
+        placeholder="🖼 Ustaw obraz...",
         options=[
-            discord.SelectOption(
-                label="Avatar bota",
-                emoji="🤖"
-            ),
-
-            discord.SelectOption(
-                label="Avatar autora",
-                emoji="👤"
-            ),
-
-            discord.SelectOption(
-                label="Własny obraz",
-                emoji="🌆"
-            ),
-
-            discord.SelectOption(
-                label="Wyłącz obrazki",
-                emoji="❌"
-            ),
+            discord.SelectOption(label="Avatar bota", emoji="🤖"),
+            discord.SelectOption(label="Avatar autora", emoji="👤"),
+            discord.SelectOption(label="Własny obraz", emoji="🌆"),
+            discord.SelectOption(label="Wyłącz obraz", emoji="❌"),
         ],
         row=2
     )
     async def image_select(self, interaction, select):
 
-        selected = select.values[0]
+        choice = select.values[0]
 
-        if selected == "Avatar bota":
+        if choice == "Avatar bota":
             self.image_mode = "bot"
 
-            await interaction.response.edit_message(
-                embed=self.build_embed(),
-                view=self
-            )
-
-        elif selected == "Avatar autora":
+        elif choice == "Avatar autora":
             self.image_mode = "author"
 
-            await interaction.response.edit_message(
-                embed=self.build_embed(),
-                view=self
-            )
-
-        elif selected == "Wyłącz obrazki":
+        elif choice == "Wyłącz obraz":
             self.image_mode = "off"
 
-            await interaction.response.edit_message(
-                embed=self.build_embed(),
-                view=self
-            )
-
-        elif selected == "Własny obraz":
+        elif choice == "Własny obraz":
 
             class ImageModal(discord.ui.Modal, title="Własny obraz"):
 
-                image_input = discord.ui.TextInput(
-                    label="URL obrazka",
-                    placeholder="https://..."
-                )
+                url = discord.ui.TextInput(label="URL obrazka")
 
                 async def on_submit(modal_self, interaction2):
-
                     self.image_mode = "custom"
-                    self.image_url = str(modal_self.image_input)
+                    self.image_url = str(modal_self.url)
 
                     await interaction2.response.edit_message(
                         embed=self.build_embed(),
@@ -592,71 +580,53 @@ class EmbedCreator(discord.ui.View):
                     )
 
             await interaction.response.send_modal(ImageModal())
+            return
+
+        await interaction.response.edit_message(
+            embed=self.build_embed(),
+            view=self
+        )
 
     # =========================
     # STOPKA
     # =========================
 
     @discord.ui.select(
-        placeholder="📄 Ustawienia stopki...",
+        placeholder="📄 Stopka...",
         options=[
             discord.SelectOption(label="Domyślna", emoji="📄"),
             discord.SelectOption(label="Ikona bota", emoji="🤖"),
-            discord.SelectOption(label="Avatar autora", emoji="👤"),
-            discord.SelectOption(label="Własny tekst", emoji="✏️"),
+            discord.SelectOption(label="Autor", emoji="👤"),
+            discord.SelectOption(label="Własna stopka", emoji="✏️"),
             discord.SelectOption(label="Wyłącz stopkę", emoji="❌"),
         ],
         row=3
     )
     async def footer_select(self, interaction, select):
 
-        selected = select.values[0]
+        choice = select.values[0]
 
-        if selected == "Domyślna":
+        if choice == "Domyślna":
             self.footer_mode = "default"
 
-            await interaction.response.edit_message(
-                embed=self.build_embed(),
-                view=self
-            )
-
-        elif selected == "Ikona bota":
+        elif choice == "Ikona bota":
             self.footer_mode = "bot"
 
-            await interaction.response.edit_message(
-                embed=self.build_embed(),
-                view=self
-            )
-
-        elif selected == "Avatar autora":
+        elif choice == "Autor":
             self.footer_mode = "author"
 
-            await interaction.response.edit_message(
-                embed=self.build_embed(),
-                view=self
-            )
-
-        elif selected == "Wyłącz stopkę":
+        elif choice == "Wyłącz stopkę":
             self.footer_mode = "off"
 
-            await interaction.response.edit_message(
-                embed=self.build_embed(),
-                view=self
-            )
-
-        elif selected == "Własny tekst":
+        elif choice == "Własna stopka":
 
             class FooterModal(discord.ui.Modal, title="Własna stopka"):
 
-                footer_input = discord.ui.TextInput(
-                    label="Tekst stopki",
-                    max_length=2048
-                )
+                text = discord.ui.TextInput(label="Tekst stopki")
 
                 async def on_submit(modal_self, interaction2):
-
                     self.footer_mode = "custom"
-                    self.custom_footer = str(modal_self.footer_input)
+                    self.custom_footer = str(modal_self.text)
 
                     await interaction2.response.edit_message(
                         embed=self.build_embed(),
@@ -664,6 +634,12 @@ class EmbedCreator(discord.ui.View):
                     )
 
             await interaction.response.send_modal(FooterModal())
+            return
+
+        await interaction.response.edit_message(
+            embed=self.build_embed(),
+            view=self
+        )
 
     # =========================
     # TIMESTAMP
@@ -674,7 +650,7 @@ class EmbedCreator(discord.ui.View):
         style=discord.ButtonStyle.secondary,
         row=4
     )
-    async def timestamp_button(self, interaction, button):
+    async def timestamp_btn(self, interaction, button):
 
         self.timestamp_enabled = not self.timestamp_enabled
 
@@ -684,42 +660,22 @@ class EmbedCreator(discord.ui.View):
         )
 
     # =========================
-    # WYBÓR KANAŁU
-    # =========================
-
-    @discord.ui.channel_select(
-        placeholder="📢 Wybierz kanał wysyłki...",
-        channel_types=[discord.ChannelType.text],
-        row=5
-    )
-    async def channel_select(self, interaction, select):
-
-        self.send_channel = select.values[0]
-
-        await interaction.response.send_message(
-            f"✅ Wybrano kanał: {self.send_channel.mention}",
-            ephemeral=True
-        )
-
-    # =========================
-    # WYŚLIJ EMBED
+    # WYŚLIJ
     # =========================
 
     @discord.ui.button(
-        label="✅ Wyślij embed",
+        label="✅ Wyślij",
         style=discord.ButtonStyle.success,
         row=6
     )
-    async def send_embed(self, interaction, button):
+    async def send(self, interaction, button):
 
         channel = self.send_channel or interaction.channel
 
-        await channel.send(
-            embed=self.build_embed()
-        )
+        await channel.send(embed=self.build_embed())
 
         await interaction.response.send_message(
-            f"✅ Embed wysłano na {channel.mention}",
+            f"✅ Wysłano embed na {channel.mention}",
             ephemeral=True
         )
 
@@ -732,13 +688,13 @@ class EmbedCreator(discord.ui.View):
         style=discord.ButtonStyle.danger,
         row=6
     )
-    async def close_creator(self, interaction, button):
+    async def close(self, interaction, button):
 
         for item in self.children:
             item.disabled = True
 
         await interaction.response.edit_message(
-            content="❌ Kreator został zamknięty.",
+            content="❌ Kreator zamknięty",
             embed=None,
             view=self
         )
@@ -749,15 +705,13 @@ class EmbedCreator(discord.ui.View):
 # =========================
 
 @bot.command()
-@is_admin()
+@commands.has_permissions(administrator=True)
 async def embed(ctx):
 
     view = EmbedCreator(ctx.author)
 
-    await ctx.send(
-        embed=view.build_embed(),
-        view=view
-    )
+    await ctx.send(embed=view.build_embed(), view=view)
+
 
 # =====================
 # ERROR HANDLER
