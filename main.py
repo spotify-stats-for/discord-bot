@@ -417,6 +417,8 @@ class EmbedCreator(discord.ui.View):
 
         self.send_channel = None
 
+        self.used = False  # 🔒 blokada duplikatu
+
         self.add_item(ChannelSelect())
 
     # =========================
@@ -470,10 +472,7 @@ class EmbedCreator(discord.ui.View):
     # EDYCJA TEKSTU
     # =========================
 
-    @discord.ui.button(
-        label="✏️ Edytuj tekst",
-        style=discord.ButtonStyle.primary
-    )
+    @discord.ui.button(label="✏️ Edytuj tekst", style=discord.ButtonStyle.primary)
     async def edit_text(self, interaction, button):
 
         class TextModal(discord.ui.Modal, title="Edycja embeda"):
@@ -640,10 +639,7 @@ class EmbedCreator(discord.ui.View):
     # TIMESTAMP
     # =========================
 
-    @discord.ui.button(
-        label="⏰ Data i godzina",
-        style=discord.ButtonStyle.secondary
-    )
+    @discord.ui.button(label="⏰ Data i godzina", style=discord.ButtonStyle.secondary)
     async def timestamp_btn(self, interaction, button):
 
         self.timestamp_enabled = not self.timestamp_enabled
@@ -657,39 +653,40 @@ class EmbedCreator(discord.ui.View):
     # WYŚLIJ
     # =========================
 
-    @discord.ui.button(
-        label="✅ Wyślij",
-        style=discord.ButtonStyle.success
-    )
+    @discord.ui.button(label="✅ Wyślij", style=discord.ButtonStyle.success)
     async def send(self, interaction, button):
+
+        if self.used:
+            return
+
+        self.used = True
 
         channel = self.send_channel or interaction.channel
 
         await channel.send(embed=self.build_embed())
 
-        await interaction.response.send_message(
-            f"✅ Wysłano embed na {channel.mention}",
-            ephemeral=True
+        await interaction.response.edit_message(
+            content="✅ Wysłano embed!",
+            embed=None,
+            view=None
         )
+
+        self.stop()
 
     # =========================
     # ZAMKNIJ
     # =========================
 
-    @discord.ui.button(
-        label="❌ Zamknij",
-        style=discord.ButtonStyle.danger
-    )
+    @discord.ui.button(label="❌ Zamknij", style=discord.ButtonStyle.danger)
     async def close(self, interaction, button):
-
-        for item in self.children:
-            item.disabled = True
 
         await interaction.response.edit_message(
             content="❌ Kreator zamknięty",
             embed=None,
-            view=self
+            view=None
         )
+
+        self.stop()
 
 # =========================
 # KOMENDA
