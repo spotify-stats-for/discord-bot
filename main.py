@@ -371,7 +371,7 @@ async def pomoc(ctx):
     )
 
 # =========================
-# WYBÓR KANAŁU (POPRAWNY)
+# WYBÓR KANAŁU
 # =========================
 
 class ChannelSelect(discord.ui.ChannelSelect):
@@ -380,8 +380,7 @@ class ChannelSelect(discord.ui.ChannelSelect):
             placeholder="📢 Wybierz kanał wysyłki...",
             channel_types=[discord.ChannelType.text],
             min_values=1,
-            max_values=1,
-            row=5
+            max_values=1
         )
 
     async def callback(self, interaction: discord.Interaction):
@@ -473,8 +472,7 @@ class EmbedCreator(discord.ui.View):
 
     @discord.ui.button(
         label="✏️ Edytuj tekst",
-        style=discord.ButtonStyle.primary,
-        row=0
+        style=discord.ButtonStyle.primary
     )
     async def edit_text(self, interaction, button):
 
@@ -517,8 +515,7 @@ class EmbedCreator(discord.ui.View):
             discord.SelectOption(label="Zielony", emoji="🟢"),
             discord.SelectOption(label="Pomarańczowy", emoji="🟠"),
             discord.SelectOption(label="Fioletowy", emoji="🟣"),
-        ],
-        row=1
+        ]
     )
     async def color_select(self, interaction, select):
 
@@ -548,8 +545,7 @@ class EmbedCreator(discord.ui.View):
             discord.SelectOption(label="Avatar autora", emoji="👤"),
             discord.SelectOption(label="Własny obraz", emoji="🌆"),
             discord.SelectOption(label="Wyłącz obraz", emoji="❌"),
-        ],
-        row=2
+        ]
     )
     async def image_select(self, interaction, select):
 
@@ -599,8 +595,7 @@ class EmbedCreator(discord.ui.View):
             discord.SelectOption(label="Autor", emoji="👤"),
             discord.SelectOption(label="Własna stopka", emoji="✏️"),
             discord.SelectOption(label="Wyłącz stopkę", emoji="❌"),
-        ],
-        row=3
+        ]
     )
     async def footer_select(self, interaction, select):
 
@@ -647,8 +642,7 @@ class EmbedCreator(discord.ui.View):
 
     @discord.ui.button(
         label="⏰ Data i godzina",
-        style=discord.ButtonStyle.secondary,
-        row=4
+        style=discord.ButtonStyle.secondary
     )
     async def timestamp_btn(self, interaction, button):
 
@@ -665,8 +659,7 @@ class EmbedCreator(discord.ui.View):
 
     @discord.ui.button(
         label="✅ Wyślij",
-        style=discord.ButtonStyle.success,
-        row=6
+        style=discord.ButtonStyle.success
     )
     async def send(self, interaction, button):
 
@@ -685,8 +678,7 @@ class EmbedCreator(discord.ui.View):
 
     @discord.ui.button(
         label="❌ Zamknij",
-        style=discord.ButtonStyle.danger,
-        row=6
+        style=discord.ButtonStyle.danger
     )
     async def close(self, interaction, button):
 
@@ -698,7 +690,6 @@ class EmbedCreator(discord.ui.View):
             embed=None,
             view=self
         )
-
 
 # =========================
 # KOMENDA
