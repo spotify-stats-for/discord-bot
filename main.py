@@ -28,7 +28,13 @@ async def send_log(embed):
     if channel:  
         await channel.send(embed=embed)  
   
-  
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    await bot.process_commands(message)
+
 # =====================  
 # STATUSY  
 # =====================  
