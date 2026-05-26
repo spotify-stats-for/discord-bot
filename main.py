@@ -199,45 +199,96 @@ async def ban(ctx, member: discord.Member, *, reason="Brak powodu"):
 # =====================
 # HELP (KATEGORIE)
 # =====================
+class HelpMenu(discord.ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(
+                label="Dla wszystkich",
+                description="Komendy użytkowników",
+                emoji="👥"
+            ),
+            discord.SelectOption(
+                label="Ogólne",
+                description="Ogólne komendy serwera",
+                emoji="📢"
+            ),
+            discord.SelectOption(
+                label="Moderacja",
+                description="Komendy administracyjne",
+                emoji="🛠"
+            ),
+        ]
+
+        super().__init__(
+            placeholder="📂 Wybierz kategorię komend...",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+
+        if self.values[0] == "Dla wszystkich":
+            embed = discord.Embed(
+                title="👥 Dla wszystkich",
+                description=(
+                    "`&ping`\n"
+                    "`&info`"
+                ),
+                color=discord.Color.green()
+            )
+
+        elif self.values[0] == "Ogólne":
+            embed = discord.Embed(
+                title="📢 Ogólne",
+                description="`&ogloszenia` (ADMIN)",
+                color=discord.Color.blue()
+            )
+
+        elif self.values[0] == "Moderacja":
+            embed = discord.Embed(
+                title="🛠 Moderacja",
+                description=(
+                    "`&clear [ilość]`\n"
+                    "`&kick @user [powód]`\n"
+                    "`&ban @user [powód]`\n"
+                    "`&embed`"
+                ),
+                color=discord.Color.red()
+            )
+
+        embed.set_thumbnail(url=interaction.client.user.display_avatar.url)
+
+        await interaction.response.edit_message(
+            embed=embed,
+            view=self.view
+        )
+
+
+class HelpView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+        self.add_item(HelpMenu())
+
+
 @bot.command(name="pomoc")
 async def pomoc(ctx):
     await ctx.message.delete()
 
     embed = discord.Embed(
         title="📘 CPM PL FIRE & RESCUE • HELP",
-        description="Kategorie komend 🚒",
+        description=(
+            "Wybierz kategorię komend z menu poniżej."
+        ),
         color=discord.Color.green()
     )
 
     embed.set_thumbnail(url=bot.user.display_avatar.url)
 
-    embed.add_field(
-        name="👥 Dla wszystkich",
-        value=(
-            "`&ping`\n"
-            "`&info`"
-        ),
-        inline=False
+    await ctx.send(
+        embed=embed,
+        view=HelpView()
     )
-
-    embed.add_field(
-        name="📢 Ogólne",
-        value="`&ogloszenia` (ADMIN)",
-        inline=False
-    )
-
-    embed.add_field(
-        name="🛠 Moderacja",
-        value=(
-            "`&clear [ilość]`\n"
-            "`&kick @user [powód]`\n"
-            "`&ban @user [powód]`\n"
-            "`&embed`"
-        ),
-        inline=False
-    )
-
-    await ctx.send(embed=embed)
 
 
 # =====================
