@@ -203,15 +203,23 @@ class HelpMenu(discord.ui.Select):
     def __init__(self):
         options = [
             discord.SelectOption(
+                label="Strona główna",
+                description="Powrót do menu głównego",
+                emoji="🏠"
+            ),
+
+            discord.SelectOption(
                 label="Dla wszystkich",
                 description="Komendy użytkowników",
                 emoji="👥"
             ),
+
             discord.SelectOption(
                 label="Ogólne",
                 description="Ogólne komendy serwera",
                 emoji="📢"
             ),
+
             discord.SelectOption(
                 label="Moderacja",
                 description="Komendy administracyjne",
@@ -228,36 +236,100 @@ class HelpMenu(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
 
-        if self.values[0] == "Dla wszystkich":
+        # =========================
+        # STRONA GŁÓWNA
+        # =========================
+        if self.values[0] == "Strona główna":
+
             embed = discord.Embed(
-                title="👥 Dla wszystkich",
+                title="📘 CPM PL FIRE & RESCUE • HELP",
                 description=(
-                    "`&ping`\n"
-                    "`&info`"
+                    "Wybierz kategorię komend z menu poniżej.\n\n"
+                    "👥 Komendy użytkowników\n"
+                    "📢 Komendy ogólne\n"
+                    "🛠 Komendy moderacyjne"
                 ),
                 color=discord.Color.green()
             )
 
+        # =========================
+        # DLA WSZYSTKICH
+        # =========================
+        elif self.values[0] == "Dla wszystkich":
+
+            embed = discord.Embed(
+                title="👥 Dla wszystkich",
+                color=discord.Color.green()
+            )
+
+            embed.add_field(
+                name="`&ping`",
+                value="Sprawdza opóźnienie bota.",
+                inline=False
+            )
+
+            embed.add_field(
+                name="`&info`",
+                value="Pokazuje informacje o serwerze lub bocie.",
+                inline=False
+            )
+
+        # =========================
+        # OGÓLNE
+        # =========================
         elif self.values[0] == "Ogólne":
+
             embed = discord.Embed(
                 title="📢 Ogólne",
-                description="`&ogloszenia` (ADMIN)",
                 color=discord.Color.blue()
             )
 
+            embed.add_field(
+                name="`&ogloszenia`",
+                value="Wysyła oficjalne ogłoszenie administracji.",
+                inline=False
+            )
+
+        # =========================
+        # MODERACJA
+        # =========================
         elif self.values[0] == "Moderacja":
+
             embed = discord.Embed(
                 title="🛠 Moderacja",
-                description=(
-                    "`&clear [ilość]`\n"
-                    "`&kick @user [powód]`\n"
-                    "`&ban @user [powód]`\n"
-                    "`&embed`"
-                ),
                 color=discord.Color.red()
             )
 
+            embed.add_field(
+                name="`&clear [ilość]`",
+                value="Usuwa wybraną liczbę wiadomości.",
+                inline=False
+            )
+
+            embed.add_field(
+                name="`&kick @user [powód]`",
+                value="Wyrzuca użytkownika z serwera.",
+                inline=False
+            )
+
+            embed.add_field(
+                name="`&ban @user [powód]`",
+                value="Banuje użytkownika na serwerze.",
+                inline=False
+            )
+
+            embed.add_field(
+                name="`&embed`",
+                value="Wysyła własny embed.",
+                inline=False
+            )
+
         embed.set_thumbnail(url=interaction.client.user.display_avatar.url)
+
+        embed.set_footer(
+            text=f"Wybrane przez: {interaction.user}",
+            icon_url=interaction.user.display_avatar.url
+        )
 
         await interaction.response.edit_message(
             embed=embed,
@@ -278,12 +350,20 @@ async def pomoc(ctx):
     embed = discord.Embed(
         title="📘 CPM PL FIRE & RESCUE • HELP",
         description=(
-            "Wybierz kategorię komend z menu poniżej."
+            "Wybierz kategorię komend z menu poniżej.\n\n"
+            "👥 Komendy użytkowników\n"
+            "📢 Komendy ogólne\n"
+            "🛠 Komendy moderacyjne"
         ),
         color=discord.Color.green()
     )
 
     embed.set_thumbnail(url=bot.user.display_avatar.url)
+
+    embed.set_footer(
+        text=f"Wywołane przez: {ctx.author}",
+        icon_url=ctx.author.display_avatar.url
+    )
 
     await ctx.send(
         embed=embed,
