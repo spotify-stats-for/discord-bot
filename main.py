@@ -374,51 +374,338 @@ async def pomoc(ctx):
 # =====================
 # EMBED BUILDER (ADMIN ONLY - FIXED)
 # =====================
-@bot.command()
-@is_admin()
-async def embed(ctx, *, content=None):
+class EmbedCreator(discord.ui.View):
+    def __init__(self, author):
+        super().__init__(timeout=600)
 
-    if content is None:
-        await ctx.send("❌ Użycie: `&embed tytuł|opis|blue/red/green/orange/purple|av on/off|stopka on/off`", delete_after=35)
-        return
+        self.author = author
 
-    try:
-        title, desc, color, avatar, footer = content.split("|")
+        self.embed_title = "📢 Nowy Embed"
+        self.embed_description = "Opis embeda"
 
-        colors = {
-            "blue": discord.Color.blue(),
-            "red": discord.Color.red(),
-            "green": discord.Color.green(),
-            "orange": discord.Color.orange(),
-            "purple": discord.Color.purple()
-        }
+        self.embed_color = discord.Color.blue()
+
+        self.footer_mode = "default"
+        self.image_mode = "thumbnail"
+
+        self.custom_footer = None
+
+        self.timestamp_enabled = False
+
+        self.channel = None
+
+    # =========================
+    # BUDOWANIE EMBEDA
+    # =========================
+
+    def build_embed(self):
 
         embed = discord.Embed(
-            title=title.strip(),
-            description=desc.strip(),
-            color=colors.get(color.strip().lower(), discord.Color.blue())
+            title=self.embed_title,
+            description=self.embed_description,
+            color=self.embed_color
         )
 
-        if avatar.strip().lower() == "on":
+        # MINIATURKA
+        if self.image_mode == "thumbnail":
             embed.set_thumbnail(url=bot.user.display_avatar.url)
 
-        if footer.strip().lower() == "on":
-            embed.set_footer(text="CPM PL FIRE & RESCUE • Custom Embed")
+        elif self.image_mode == "author":
+            embed.set_thumbnail(url=self.author.display_avatar.url)
 
-        await ctx.send(embed=embed)
+        # STOPKA
+        if self.footer_mode == "default":
+            embed.set_footer(
+                text="CPM PL FIRE & RESCUE • Custom Embed"
+            )
+
+        elif self.footer_mode == "bot":
+            embed.set_footer(
+                text="CPM PL FIRE & RESCUE • Custom Embed",
+                icon_url=bot.user.display_avatar.url
+            )
+
+        elif self.footer_mode == "author":
+            embed.set_footer(
+                text=f"Autor: {self.author}",
+                icon_url=self.author.display_avatar.url
+            )
+
+        elif self.footer_mode == "custom" and self.custom_footer:
+            embed.set_footer(text=self.custom_footer)
+
+        # DATA I GODZINA
+        if self.timestamp_enabled:
+            embed.timestamp = discord.utils.utcnow()
+
+        return embed
+
+    # =========================
+    # EDYTUJ TEKST
+    # =========================
+
+    @discord.ui.button(
+        label="✏️ Edytuj tekst",
+        style=discord.ButtonStyle.primary,
+        row=0
+    )
+    async def edit_text(self, interaction, button):
+
+        class TextModal(discord.ui.Modal, title="Edycja embeda"):
+
+            title_input = discord.ui.TextInput(
+                label="Tytuł",
+                default=self.embed_title,
+                max_length=256
+            )
+
+            description_input = discord.ui.TextInput(
+                label="Opis",
+                style=discord.TextStyle.paragraph,
+                default=self.embed_description,
+                max_length=4000
+            )
+
+            async def on_submit(modal_self, interaction2):
+
+                self.embed_title = str(modal_self.title_input)
+                self.embed_description = str(modal_self.description_input)
+
+                await interaction2.response.edit_message(
+                    embed=self.build_embed(),
+                    view=self
+                )
+
+        await interaction.response.send_modal(TextModal())
+
+    # =========================
+    # WYBÓR KOLORU
+    # =========================
+
+    @discord.ui.select(
+        placeholder="🎨 Wybierz kolor...",
+        options=[
+            discord.SelectOption(label="Niebieski", emoji="🔵"),
+            discord.SelectOption(label="Czerwony", emoji="🔴"),
+            discord.SelectOption(label="Zielony", emoji="🟢"),
+            discord.SelectOption(label="Pomarańczowy", emoji="🟠"),
+            discord.SelectOption(label="Fioletowy", emoji="🟣"),
+        ],
+        row=1
+    )
+    async def select_color(self, interaction, select):
+
+        colors = {
+            "Niebieski": discord.Color.blue(),
+            "Czerwony": discord.Color.red(),
+            "Zielony": discord.Color.green(),
+            "Pomarańczowy": discord.Color.orange(),
+            "Fioletowy": discord.Color.purple()
+        }
+
+        self.embed_color = colors[select.values[0]]
+
+        await interaction.response.edit_message(
+            embed=self.build_embed(),
+            view=self
+        )
+
+    # =========================
+    # ZDJĘCIE
+    # =========================
+
+    @discord.ui.button(
+        label="🖼 Zdjęcie",
+        style=discord.ButtonStyle.secondary,
+        row=2
+    )
+    async def image_button(self, interaction, button):
+
+        if self.image_mode == "thumbnail":
+            self.image_mode = "author"
+
+        elif self.image_mode == "author":
+            self.image_mode = "off"
+
+        else:
+            self.image_mode = "thumbnail"
+
+        await interaction.response.edit_message(
+            embed=self.build_embed(),
+            view=self
+        )
+
+    # =========================
+    # STOPKA
+    # =========================
+
+    @discord.ui.button(
+        label="📄 Stopka",
+        style=discord.ButtonStyle.secondary,
+        row=2
+    )
+    async def footer_button(self, interaction, button):
+
+        if self.footer_mode == "default":
+            self.footer_mode = "bot"
+
+        elif self.footer_mode == "bot":
+            self.footer_mode = "author"
+
+        elif self.footer_mode == "author":
+            self.footer_mode = "off"
+
+        else:
+            self.footer_mode = "default"
+
+        await interaction.response.edit_message(
+            embed=self.build_embed(),
+            view=self
+        )
+
+    # =========================
+    # DATA I GODZINA
+    # =========================
+
+    @discord.ui.button(
+        label="⏰ Data i godzina",
+        style=discord.ButtonStyle.secondary,
+        row=2
+    )
+    async def timestamp_button(self, interaction, button):
+
+        self.timestamp_enabled = not self.timestamp_enabled
+
+        await interaction.response.edit_message(
+            embed=self.build_embed(),
+            view=self
+        )
+
+    # =========================
+    # GOTOWE SZABLONY
+    # =========================
+
+    @discord.ui.select(
+        placeholder="🔥 Gotowe szablony...",
+        options=[
+            discord.SelectOption(label="Ogłoszenie", emoji="📢"),
+            discord.SelectOption(label="Alarm", emoji="🚨"),
+            discord.SelectOption(label="Rekrutacja", emoji="✅"),
+            discord.SelectOption(label="Regulamin", emoji="⚠️"),
+        ],
+        row=3
+    )
+    async def templates(self, interaction, select):
+
+        selected = select.values[0]
+
+        if selected == "Ogłoszenie":
+            self.embed_title = "📢 OGŁOSZENIE"
+            self.embed_description = "Treść ogłoszenia..."
+            self.embed_color = discord.Color.blue()
+
+        elif selected == "Alarm":
+            self.embed_title = "🚨 ALARM"
+            self.embed_description = "Treść alarmu..."
+            self.embed_color = discord.Color.red()
+
+        elif selected == "Rekrutacja":
+            self.embed_title = "✅ REKRUTACJA"
+            self.embed_description = "Rekrutacja została otwarta."
+            self.embed_color = discord.Color.green()
+
+        elif selected == "Regulamin":
+            self.embed_title = "⚠️ REGULAMIN"
+            self.embed_description = "Zapoznaj się z regulaminem."
+            self.embed_color = discord.Color.orange()
+
+        await interaction.response.edit_message(
+            embed=self.build_embed(),
+            view=self
+        )
+
+    # =========================
+    # WYCZYŚĆ
+    # =========================
+
+    @discord.ui.button(
+        label="🧹 Wyczyść",
+        style=discord.ButtonStyle.danger,
+        row=4
+    )
+    async def clear_embed(self, interaction, button):
+
+        self.embed_title = "📢 Nowy Embed"
+        self.embed_description = "Opis embeda"
+
+        self.embed_color = discord.Color.blue()
+
+        await interaction.response.edit_message(
+            embed=self.build_embed(),
+            view=self
+        )
+
+    # =========================
+    # WYŚLIJ
+    # =========================
+
+    @discord.ui.button(
+        label="✅ Wyślij embed",
+        style=discord.ButtonStyle.success,
+        row=4
+    )
+    async def send_embed(self, interaction, button):
+
+        await interaction.channel.send(
+            embed=self.build_embed()
+        )
+
+        await interaction.response.send_message(
+            "✅ Embed został wysłany.",
+            ephemeral=True
+        )
 
         await send_log(discord.Embed(
             title="🎨 CUSTOM EMBED",
-            description=f"Autor: {ctx.author}",
+            description=f"Autor: {interaction.user}",
             color=discord.Color.purple()
         ))
 
-    except ValueError:
-        await ctx.send(
-            "❌ Zły format!\n"
-            "`&embed tytuł|opis|blue|on|on`",
-            delete_after=5
+    # =========================
+    # ZAMKNIJ
+    # =========================
+
+    @discord.ui.button(
+        label="❌ Zamknij",
+        style=discord.ButtonStyle.gray,
+        row=4
+    )
+    async def close_creator(self, interaction, button):
+
+        for item in self.children:
+            item.disabled = True
+
+        await interaction.response.edit_message(
+            content="❌ Kreator został zamknięty.",
+            embed=None,
+            view=self
         )
+
+
+# =========================
+# KOMENDA
+# =========================
+
+@bot.command()
+@is_admin()
+async def embed(ctx):
+
+    view = EmbedCreator(ctx.author)
+
+    await ctx.send(
+        embed=view.build_embed(),
+        view=view
+    )
 
 
 # =====================
@@ -428,10 +715,10 @@ async def embed(ctx, *, content=None):
 async def on_command_error(ctx, error):
 
     if isinstance(error, commands.CommandNotFound):
-        await ctx.send("❌ Nieznana komenda → `&pomoc`", delete_after=5)
+        await ctx.send("❌ Nieznana komenda → `&pomoc`", delete_after=10)
 
     elif isinstance(error, commands.MissingPermissions):
-        await ctx.send("🔒 Brak uprawnień", delete_after=5)
+        await ctx.send("🔒 Brak uprawnień", delete_after=10)
 
     else:
         raise error
