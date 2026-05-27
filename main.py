@@ -662,43 +662,44 @@ class EmbedCreator(discord.ui.View):
     # =========================  
     # WYŚLIJ  
     # =========================  
-  
-    @discord.ui.button(
-    label="✅ Wyślij",
-    style=discord.ButtonStyle.success
-)
-async def send(self, interaction: discord.Interaction, button):
 
-    if self.used:
-        return
+@discord.ui.button(
+        label="✅ Wyślij",
+        style=discord.ButtonStyle.success
+    )
+    async def send(self, interaction: discord.Interaction, button):
 
-    self.used = True
+        if self.used:
+            return
 
-    channel = self.send_channel
+        self.used = True
 
-    # fallback jeśli nie wybrano kanału
-    if channel is None:
-        channel = interaction.channel
+        channel = self.send_channel
 
-    try:
-        await channel.send(embed=self.build_embed())
+        # fallback jeśli nie wybrano kanału
+        if channel is None:
+            channel = interaction.channel
 
-        await interaction.response.edit_message(
-            content="✅ Wysłano embed!",
-            embed=None,
-            view=None
-        )
+        try:
+            await channel.send(embed=self.build_embed())
 
-    except Exception as e:
+            await interaction.response.edit_message(
+                content="✅ Wysłano embed!",
+                embed=None,
+                view=None
+            )
 
-        self.used = False
+        except Exception as e:
 
-        await interaction.response.send_message(
-            f"❌ Błąd podczas wysyłania:\n```python\n{e}\n```",
-            ephemeral=True
-        )
+            self.used = False
 
-    self.stop() 
+            await interaction.response.send_message(
+                f"❌ Błąd podczas wysyłania:\n```python\n{e}\n```",
+                ephemeral=True
+            )
+
+        self.stop()
+ 
   
     # =========================  
     # ZAMKNIJ  
