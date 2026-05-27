@@ -663,9 +663,8 @@ class EmbedCreator(discord.ui.View):
     # WYŚLIJ  
     # =========================  
 
-@discord.ui.button(
-        label="✅ Wyślij",
-        style=discord.ButtonStyle.success
+    @discord.ui.button(label="✅ Wyślij",
+style=discord.ButtonStyle.success
     )
     async def send(self, interaction: discord.Interaction, button):
 
