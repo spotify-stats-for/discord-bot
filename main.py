@@ -375,27 +375,31 @@ async def pomoc(ctx):
         embed=embed,  
         view=HelpView()  
     )  
-  
-# =========================  
-# WYBÓR KANAŁU  
-# =========================  
-  
-class ChannelSelect(discord.ui.ChannelSelect):  
-    def __init__(self):  
-        super().__init__(  
-            placeholder="📢 Wybierz kanał wysyłki...",  
-            channel_types=[discord.ChannelType.text],  
-            min_values=1,  
-            max_values=1  
-        )  
-  
-    async def callback(self, interaction: discord.Interaction):  
-        self.view.send_channel = self.values[0]  
-  
-        await interaction.response.send_message(  
-            f"✅ Kanał ustawiony: {self.values[0].mention}",  
-            ephemeral=True  
-        )  
+   
+# =========================
+# WYBÓR KANAŁU
+# =========================
+
+class ChannelSelect(discord.ui.ChannelSelect):
+    def __init__(self):
+        super().__init__(
+            placeholder="📢 Wybierz kanał wysyłki...",
+            channel_types=[discord.ChannelType.text],
+            min_values=1,
+            max_values=1
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+
+        # zapisuje poprawny kanał
+        self.view.send_channel = interaction.guild.get_channel(
+            self.values[0].id
+        )
+
+        await interaction.response.send_message(
+            f"✅ Kanał ustawiony: {self.view.send_channel.mention}",
+            ephemeral=True
+        )
   
   
 # =========================  
@@ -659,25 +663,42 @@ class EmbedCreator(discord.ui.View):
     # WYŚLIJ  
     # =========================  
   
-    @discord.ui.button(label="✅ Wyślij", style=discord.ButtonStyle.success)  
-    async def send(self, interaction, button):  
-  
-        if self.used:  
-            return  
-  
-        self.used = True  
-  
-        channel = self.send_channel or interaction.channel  
-  
-        await channel.send(embed=self.build_embed())  
-  
-        await interaction.response.edit_message(  
-            content="✅ Wysłano embed!",  
-            embed=None,  
-            view=None  
-        )  
-  
-        self.stop()  
+    @discord.ui.button(
+    label="✅ Wyślij",
+    style=discord.ButtonStyle.success
+)
+async def send(self, interaction: discord.Interaction, button):
+
+    if self.used:
+        return
+
+    self.used = True
+
+    channel = self.send_channel
+
+    # fallback jeśli nie wybrano kanału
+    if channel is None:
+        channel = interaction.channel
+
+    try:
+        await channel.send(embed=self.build_embed())
+
+        await interaction.response.edit_message(
+            content="✅ Wysłano embed!",
+            embed=None,
+            view=None
+        )
+
+    except Exception as e:
+
+        self.used = False
+
+        await interaction.response.send_message(
+            f"❌ Błąd podczas wysyłania:\n```python\n{e}\n```",
+            ephemeral=True
+        )
+
+    self.stop() 
   
     # =========================  
     # ZAMKNIJ  
