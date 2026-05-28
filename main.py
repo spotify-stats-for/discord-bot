@@ -258,6 +258,39 @@ async def info(ctx):
     await ctx.send(embed=embed)  
   
   
+#========================
+# PRZYPOMNIENIE ZMIANA NICKU
+#========================
+@bot.command()
+async def przypomnienie(ctx, user: discord.Member):
+
+    try:
+
+        embed = discord.Embed(
+            title="📌 Przypomnienie",
+            description=(
+                f"Cześć {user.mention} 👋\n\n"
+                "Zauważyłem, że nie masz ustawionego nicku z gry na naszym serwerze ⚠️\n"
+                "Proszę, zaktualizuj go jak najszybciej 🛠️\n\n"
+                "Jeśli masz problem 😕, napisz do supportu na kanale "
+                "<#1509566757378199742> 💬\n\n"
+                "Dziękuję i życzę miłego dnia 😊"
+            ),
+            color=discord.Color.orange()
+        )
+
+        embed.set_footer(text="🤖 Wiadomość automatyczna od bota")
+
+        await user.send(embed=embed)
+
+        await ctx.send(f"✔ Przypomnienie wysłane do {user.mention} 📩")
+
+    except discord.Forbidden:
+        await ctx.send("❌ Nie mogę wysłać DM do tego użytkownika.")
+
+    except Exception as e:
+        await ctx.send(f"❌ Błąd: {e}")
+
 # =====================  
 # OGŁOSZENIA (ADMIN)  
 # =====================  
