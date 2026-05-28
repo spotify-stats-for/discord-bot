@@ -80,6 +80,118 @@ def is_admin():
 async def ping(ctx):  
     await ctx.send(f"🏓 Pong! `{round(bot.latency * 1000)}ms`")  
   
+# =========================
+# KONFIG
+# =========================
+
+ticket_config = {}
+OWNER_ID = 975463222310219846
+
+
+# =========================
+# KOMENDA SETUP
+# =========================
+
+@bot.command()
+async def ticket(ctx, channel_id: int):
+    channel = bot.get_channel(channel_id)
+
+    ticket_config[ctx.guild.id] = channel_id
+
+    embed = discord.Embed(
+        title="📩 System zgłoszeń",
+        description="Kliknij przycisk poniżej, aby otworzyć zgłoszenie.",
+        color=discord.Color.blurple()
+    )
+
+    await channel.send(embed=embed, view=TicketView())
+    await ctx.send("✔ System ticketów został ustawiony.")
+
+
+# =========================
+# PRZYCISK OTWIERANIA TICKETA
+# =========================
+
+class TicketView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="🎫 Otwórz zgłoszenie", style=discord.ButtonStyle.green)
+    async def open_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+        guild = interaction.guild
+        user = interaction.user
+
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            user: discord.PermissionOverwrite(view_channel=True, send_messages=True),
+            guild.me: discord.PermissionOverwrite(view_channel=True),
+        }
+
+        for role in guild.roles:
+            if role.permissions.administrator:
+                overwrites[role] = discord.PermissionOverwrite(view_channel=True)
+
+        channel = await guild.create_text_channel(
+            name=f"ticket-{user.name}".lower(),
+            overwrites=overwrites
+        )
+
+        await channel.send(
+            f"Witaj {user.mention}, jestem asystentem i pomogę Ci z Twoim problemem.",
+            view=TicketFormView(user.id)
+        )
+
+        await interaction.response.send_message(
+            f"✔ Utworzono zgłoszenie: {channel.mention}",
+            ephemeral=True
+        )
+
+
+# =========================
+# PRZYCISK W TICKECIE
+# =========================
+
+class TicketFormView(discord.ui.View):
+    def __init__(self, user_id):
+        super().__init__()
+        self.user_id = user_id
+
+    @discord.ui.button(label="📝 Opisz problem", style=discord.ButtonStyle.primary)
+    async def form(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(TicketModal(self.user_id))
+
+
+# =========================
+# FORMULARZ ZGŁOSZENIA
+# =========================
+
+class TicketModal(discord.ui.Modal, title="Zgłoszenie"):
+
+    category = discord.ui.TextInput(label="Kategoria")
+    description = discord.ui.TextInput(label="Opis", style=discord.TextStyle.paragraph)
+
+    def __init__(self, user_id):
+        super().__init__()
+        self.user_id = user_id
+
+    async def on_submit(self, interaction: discord.Interaction):
+
+        owner = await bot.fetch_user(OWNER_ID)
+
+        embed = discord.Embed(
+            title="📩 Nowe zgłoszenie",
+            description=f"**User:** {interaction.user}\n"
+                        f"**Kategoria:** {self.category}\n"
+                        f"**Opis:** {self.description}",
+            color=discord.Color.red()
+        )
+
+        await owner.send(embed=embed)
+
+        await interaction.response.send_message(
+            "✔ Zgłoszenie wysłane. Już poinformowałem asystenta i zaraz go powiadomię o Twoim zgłoszeniu."
+        )
   
 # =====================  
 # INFO (ALL)  
