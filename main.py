@@ -89,7 +89,7 @@ OWNER_ID = 975463222310219846
 
 
 # =========================
-# KOMENDA SETUP
+# SETUP KOMENDA
 # =========================
 
 @bot.command()
@@ -100,23 +100,27 @@ async def ticket(ctx, channel_id: int):
 
     embed = discord.Embed(
         title="📩 System zgłoszeń",
-        description="Kliknij przycisk poniżej, aby otworzyć zgłoszenie.",
+        description="Kliknij przycisk poniżej aby otworzyć zgłoszenie.",
         color=discord.Color.blurple()
     )
 
-    await channel.send(embed=embed, view=TicketView())
-    await ctx.send("✔ System ticketów został ustawiony.")
+    await channel.send(embed=embed, view=TicketViewPersistent())
+    await ctx.send("✔ System ticketów ustawiony.")
 
 
 # =========================
-# PRZYCISK OTWIERANIA TICKETA
+# PERSISTENT VIEW (NA START BOTA)
 # =========================
 
-class TicketView(discord.ui.View):
+class TicketViewPersistent(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="🎫 Otwórz zgłoszenie", style=discord.ButtonStyle.green)
+    @discord.ui.button(
+        label="🎫 Otwórz zgłoszenie",
+        style=discord.ButtonStyle.green,
+        custom_id="open_ticket_button"
+    )
     async def open_ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
 
         guild = interaction.guild
@@ -138,8 +142,13 @@ class TicketView(discord.ui.View):
         )
 
         await channel.send(
-            f"Witaj {user.mention}, jestem asystentem i pomogę Ci z Twoim problemem.",
+            f"Witaj {user.mention}, jestem asystentem i pomogę Ci z problemem.",
             view=TicketFormView(user.id)
+        )
+
+        await channel.send(
+            "🔒 Aby zamknąć zgłoszenie kliknij przycisk poniżej.",
+            view=CloseTicketView()
         )
 
         await interaction.response.send_message(
@@ -149,7 +158,7 @@ class TicketView(discord.ui.View):
 
 
 # =========================
-# PRZYCISK W TICKECIE
+# FORMULARZ W TICKECIE
 # =========================
 
 class TicketFormView(discord.ui.View):
@@ -157,13 +166,17 @@ class TicketFormView(discord.ui.View):
         super().__init__()
         self.user_id = user_id
 
-    @discord.ui.button(label="📝 Opisz problem", style=discord.ButtonStyle.primary)
+    @discord.ui.button(
+        label="📝 Opisz problem",
+        style=discord.ButtonStyle.primary,
+        custom_id="ticket_form_button"
+    )
     async def form(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(TicketModal(self.user_id))
 
 
 # =========================
-# FORMULARZ ZGŁOSZENIA
+# MODAL
 # =========================
 
 class TicketModal(discord.ui.Modal, title="Zgłoszenie"):
@@ -190,9 +203,43 @@ class TicketModal(discord.ui.Modal, title="Zgłoszenie"):
         await owner.send(embed=embed)
 
         await interaction.response.send_message(
-            "✔ Zgłoszenie wysłane. Już poinformowałem asystenta i zaraz go powiadomię o Twoim zgłoszeniu."
+            "✔ Zgłoszenie wysłane. Już je otrzymałem i zaraz się tym zajmę."
         )
-  
+
+
+# =========================
+# ZAMYKANIE TICKETA
+# =========================
+
+class CloseTicketView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(
+        label="🔒 Zamknij ticket",
+        style=discord.ButtonStyle.red,
+        custom_id="close_ticket_button"
+    )
+    async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+        await interaction.response.send_message(
+            "🔒 Ticket zostanie zamknięty...",
+            ephemeral=True
+        )
+
+        await interaction.channel.delete()
+
+# =========================
+# PERSISTENT VIEW REJESTRACJA
+# =========================
+
+@bot.event
+async def on_ready():
+    bot.add_view(TicketViewPersistent())
+    bot.add_view(CloseTicketView())
+    print("✔ Ticket system aktywny (persistent views loaded)")  
+
+
 # =====================  
 # INFO (ALL)  
 # =====================  
