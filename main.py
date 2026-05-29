@@ -203,7 +203,9 @@ class TicketModal(discord.ui.Modal, title="Zgłoszenie"):
         await owner.send(embed=embed)
 
         await interaction.response.send_message(
-            "✔ Zgłoszenie wysłane. Już je otrzymałem i zaraz się tym zajmę."
+            " ✅ Witaj! Przyjąłem Twoje zgłoszenie i już powiadomiłem support o Twojej sprawie 📩
+
+🛠️ Proszę o chwilę cierpliwości ktoś z zespołu wkrótce Ci pomoże 😊"
         )
 
 
