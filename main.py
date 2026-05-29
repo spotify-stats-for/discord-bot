@@ -520,7 +520,19 @@ class HelpMenu(discord.ui.Select):
                 name="`&embed`",  
                 value="Wysyła własny embed.",  
                 inline=False  
-            )  
+            ) 
+ 
+            embed.add_field(  
+                name="`&ticket <#ID>`",  
+                value="Tworzy nowy ticket.",  
+                inline=False  
+            ) 
+
+            embed.add_field(  
+                name="`&przypomnienie <@ID>`",  
+                value="Wysyła przypomnienie o zmianie nicku na pv.",  
+                inline=False  
+            ) 
   
         embed.set_thumbnail(url=interaction.client.user.display_avatar.url)  
   
